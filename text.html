@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropship Explorer</title>
+    <style>
+        /* Color Palette:
+           Primary: #4CAF50 (Green) - For accents, buttons
+           Secondary: #8BC34A (Light Green) - For softer accents
+           Background: #F0F4F8 (Light Blue-Grey) - For main background
+           Card Background: #FFFFFF (White) - For product cards
+           Text: #333333 (Dark Grey) - For primary text
+           Light Text: #666666 (Medium Grey) - For secondary text
+           Hover/Active: #388E3C (Darker Green)
+        */
+
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --background-color: #F0F4F8;
+            --card-background-color: #FFFFFF;
+            --text-color: #333333;
+            --light-text-color: #666666;
+            --hover-color: #388E3C;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scroll from animations */
+        }
+
+        header {
+            background-color: var(--card-background-color);
+            padding: 1.5em 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.2em;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        nav {
+            margin-top: 1em;
+        }
+
+        nav a {
+            color: var(--light-text-color);
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: 500;
+            transition: color 0.3s ease, transform 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease, left 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2em auto;
+            padding: 0 1em;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2em;
+        }
+
+        .product-card {
+            background-color: var(--card-background-color);
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            opacity: 0; /* For JavaScript fade-in */
+            transform: translateY(20px); /* For JavaScript slide-up */
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 1px solid #eee;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 1.5em;
+            text-align: center;
+        }
+
+        .product-info h3 {
+            margin-top: 0;
+            margin-bottom: 0.8em;
+            color: var(--text-color);
+            font-size: 1.4em;
+        }
+
+        .product-info p.description {
+            color: var(--light-text-color);
+            font-size: 0.9em;
+            margin-bottom: 1.2em;
+            height: 40px; /* Limit height for consistency */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .product-price {
+            font-size: 1.8em;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 1.5em;
+        }
+
+        .add-to-cart-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .add-to-cart-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(76, 175, 80, 0.2);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2em 0;
+            color: var(--light-text-color);
+            font-size: 0.9em;
+            margin-top: 3em;
+            background-color: var(--card-background-color);
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            nav a {
+                margin: 0 10px;
+                font-size: 0.9em;
+            }
+            .container {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 1.5em;
+            }
+            .product-card {
+                margin: 0 auto; /* Center cards on smaller screens */
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+            nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            nav a {
+                margin: 5px 8px;
+            }
+            .container {
+                padding: 0 0.8em;
+            }
+            .product-info {
+                padding: 1em;
+            }
+            .add-to-cart-btn {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dropship Central</h1>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">Products</a>
+            <a href="#">Categories</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="product-card" data-animation-delay="0">
+            <img src="https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Gadget+X" alt="Product Gadget X">
+            <div class="product-info">
+                <h3>Smart Fitness Tracker</h3>
+                <p class="description">Track your steps, heart rate, and sleep with this advanced fitness companion.</p>
+                <div class="product-price">$49.99</div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-animation-delay="100">
+            <img src="https://via.placeholder.com/400x300/8BC34A/FFFFFF?text=Eco+Bottle" alt="Product Eco Bottle">
+            <div class="product-info">
+                <h3>Eco-Friendly Water Bottle</h3>
+                <p class="description">Stay hydrated with our durable, BPA-free, and stylish eco-friendly bottle.</p>
+                <div class="product-price">$19.99</div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-animation-delay="200">
+            <img src="https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Wireless+Earbuds" alt="Product Wireless Earbuds">
+            <div class="product-info">
+                <h3>Premium Wireless Earbuds</h3>
+                <p class="description">Experience crystal-clear audio and deep bass with these comfortable earbuds.</p>
+                <div class="product-price">$79.99</div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-animation-delay="300">
+            <img src="https://via.placeholder.com/400x300/8BC34A/FFFFFF?text=Smart+Lamp" alt="Product Smart Lamp">
+            <div class="product-info">
+                <h3>Smart LED Desk Lamp</h3>
+                <p class="description">Adjust brightness and color temperature with voice control or app integration.</p>
+                <div class="product-price">$34.50</div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-animation-delay="400">
+            <img src="https://via.placeholder.com/400x300/4CAF50/FFFFFF?text=Travel+Backpack" alt="Product Travel Backpack">
+            <div class="product-info">
+                <h3>Anti-Theft Travel Backpack</h3>
+                <p class="description">Secure your belongings with hidden zippers and durable, water-resistant fabric.</p>
+                <div class="product-price">$65.00</div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <div class="product-card" data-animation-delay="500">
+            <img src="https://via.placeholder.com/400x300/8BC34A/FFFFFF?text=Coffee+Maker" alt="Product Coffee Maker">
+            <div class="product-info">
+                <h3>Portable Coffee Maker</h3>
+                <p class="description">Brew your favorite coffee on the go with this compact and easy-to-use device.</p>
+                <div class="product-price">$29.99</div>
+                <button class="add-to-cart-btn">Add to Cart</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Dropship Central. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth scroll for navigation (if navigation links were IDs)
+            document.querySelectorAll('nav a').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    // e.preventDefault(); // Uncomment if you want smooth scroll for actual sections
+
+                    // Example: Alert when clicking "Add to Cart"
+                    if (this.textContent === 'Add to Cart') {
+                        // This would typically involve sending data to a backend
+                        alert('Item added to hypothetical cart! (Frontend only)');
+                    }
+                });
+            });
+
+            // Product card fade-in and slide-up on load
+            const productCards = document.querySelectorAll('.product-card');
+            const observerOptions = {
+                root: null, // viewport
+                rootMargin: '0px',
+                threshold: 0.1 // When 10% of the item is visible
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const delay = parseInt(entry.target.dataset.animationDelay || '0');
+                        setTimeout(() => {
+                            entry.target.style.animation = `slideInUp 0.8s ease-out forwards, fadeIn 0.8s ease-out forwards`;
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, delay);
+                        observer.unobserve(entry.target); // Stop observing once animated
+                    }
+                });
+            }, observerOptions);
+
+            productCards.forEach(card => {
+                observer.observe(card);
+            });
+
+            // Add to Cart button click animation and basic alert
+            const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+            addToCartButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.classList.add('clicked'); // Add a class for potential CSS animation
+                    setTimeout(() => {
+                        button.classList.remove('clicked');
+                    }, 300); // Remove class after animation
+                    alert('Product added to cart! (This is a frontend demo)');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
